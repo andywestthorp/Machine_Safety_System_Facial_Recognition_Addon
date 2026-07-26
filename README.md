@@ -1,8 +1,8 @@
-# Machine Safety System
+# Machine Safety System - Facial Recognition Addon
 
 A lightweight hybrid web and desktop application designed to enroll, store, and verify pupil facial recognition vectors. The system uses a **PHP/JS** interface for vector enrollment via a web browser and a **Python** script for real-time video verification.
 
-This is an addon to an existing RFID based system which I built a few years ago and have trialled with my pupils- but found taht tehy often forgot to bring their RFID tags. Hopefully, they won't forget to bring their faces?
+This is an addon to an existing RFID based system which I built a few years ago and have trialled with my pupils- but found that they often forgot to bring their RFID tags. Hopefully, they won't forget to bring their faces?
 
 ---
 
