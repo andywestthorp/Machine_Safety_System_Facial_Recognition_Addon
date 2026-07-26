@@ -1,7 +1,7 @@
 <?php
 // Database configuration
 $host     = 'localhost';
-$db_name  = '';
+$db_name  = 'YOUR_DB';
 $username = 'YOUR_DB_USER';                 // Replace with your DB username
 $password = 'YOUR_DB_PASSWORD';             // Replace with your DB password
 
