@@ -1,29 +1,41 @@
 import json
 import os
+import sys
 import time
+
+# -----------------------------------------------------------------
+# 1. Environment & Logging Clean-up (Suppresses Qt/Font warnings)
+# -----------------------------------------------------------------
+os.environ["QT_LOGGING_RULES"] = "qt.qpa.fonts=false;*.warning=false"
+os.environ["QT_QPA_PLATFORM"] = "xcb"
+
+# Auto-create missing OpenCV Qt font directory if in virtualenv to stop Qt complaints
+cv2_qt_fonts = os.path.join(
+    sys.prefix,
+    "lib",
+    f"python{sys.version_info.major}.{sys.version_info.minor}",
+    "site-packages",
+    "cv2",
+    "qt",
+    "fonts",
+)
+os.makedirs(cv2_qt_fonts, exist_ok=True)
+
 import cv2
 import face_recognition
 import numpy as np
 import requests
 import serial
-import sys
 
-# 1. Suppress Qt/Wayland logging noise
-os.environ["QT_LOGGING_RULES"] = "qt.qpa.fonts=false;*.warning=false"
-os.environ["QT_QPA_PLATFORM"] = "xcb"
-
-# 2. Auto-create missing OpenCV Qt font directory if running in venv
-cv2_qt_fonts = os.path.join(
-    sys.prefix, "lib", f"python{sys.version_info.major}.{sys.version_info.minor}", "site-packages", "cv2", "qt", "fonts"
-)
-os.makedirs(cv2_qt_fonts, exist_ok=True)
-
-# Namecheap PHP API Endpoint
+# Configuration
 API_URL = ""
-
-# Serial Port Configuration
 SERIAL_PORT = "/dev/ttyUSB0"  # Change to /dev/ttyACM0 if needed
 BAUD_RATE = 115200
+
+# TFT Display Configuration
+TFT_FB_DEVICE = "/dev/fb1"  # Default framebuffer for 3.5" SPI TFT screens
+TFT_WIDTH = 480  # Common 3.5" TFT width
+TFT_HEIGHT = 320  # Common 3.5" TFT height
 
 
 def init_serial():
@@ -76,9 +88,32 @@ def fetch_known_faces():
     return known_encodings, known_names, known_rfids
 
 
+def render_to_tft(frame, fb_device=TFT_FB_DEVICE):
+    """Resize image and write raw bytes directly to TFT framebuffer."""
+    try:
+        # Resize to fit 3.5" screen dimensions
+        resized = cv2.resize(frame, (TFT_WIDTH, TFT_HEIGHT))
+
+        # Convert OpenCV BGR format to BGR565 (16-bit color format used by Linux Framebuffers)
+        bgr565_frame = cv2.cvtColor(resized, cv2.COLOR_BGR2BGR565)
+
+        # Write to screen device file
+        with open(fb_device, "wb") as fb:
+            fb.write(bgr565_frame.tobytes())
+    except Exception as e:
+        pass  # Ignore framebuffer write errors if device is busy or unreadable
+
+
 def main():
     known_encodings, known_names, known_rfids = fetch_known_faces()
     ser = init_serial()
+
+    # Check if 3.5" TFT Framebuffer is present
+    has_tft = os.path.exists(TFT_FB_DEVICE)
+    if has_tft:
+        print(f" 3.5 TFT Screen detected on {TFT_FB_DEVICE} (Headless Mode)")
+    else:
+        print(" No TFT framebuffer detected. Defaulting to Desktop GUI window.")
 
     video_capture = cv2.VideoCapture(0)
     video_capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
@@ -98,7 +133,7 @@ def main():
             break
 
         if process_this_frame:
-            # Downscale frame to 1/4 size
+            # Downscale frame to 1/4 size for fast processing on Raspberry Pi CPU
             small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
             rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
 
@@ -149,24 +184,23 @@ def main():
         process_this_frame = not process_this_frame
 
         # -----------------------------------------------------------------
-        # Render Results directly onto the Video Frame
+        # Render Bounding Boxes and Labels onto Video Frame
         # -----------------------------------------------------------------
         for (top, right, bottom, left), (name, rfid) in zip(
             face_locations, face_names
         ):
-            # Scale face locations back up by 4 since the frame was processed at 1/4 size
+            # Scale coordinates back up by 4x
             top *= 4
             right *= 4
             bottom *= 4
             left *= 4
 
-            # Set color: Green for known profiles, Red for Unknown
             box_color = (0, 255, 0) if name != "Unknown" else (0, 0, 255)
 
-            # Draw bounding box around the face
+            # Draw face box
             cv2.rectangle(frame, (left, top), (right, bottom), box_color, 2)
 
-            # Draw label banner at the bottom of the box
+            # Draw banner & text label
             label_text = f"{name} (RFID: {rfid})" if rfid != "N/A" else name
             cv2.rectangle(
                 frame,
@@ -185,10 +219,15 @@ def main():
                 1,
             )
 
-        # Show frame in GUI Window
-        cv2.imshow("Pi Scanner", frame)
-        if cv2.waitKey(1) & 0xFF == ord("q"):
-            break
+        # -----------------------------------------------------------------
+        # Output Video Stream (TFT Framebuffer OR Desktop Window)
+        # -----------------------------------------------------------------
+        if has_tft:
+            render_to_tft(frame)
+        else:
+            cv2.imshow("Pi Scanner", frame)
+            if cv2.waitKey(1) & 0xFF == ord("q"):
+                break
 
     video_capture.release()
     cv2.destroyAllWindows()
