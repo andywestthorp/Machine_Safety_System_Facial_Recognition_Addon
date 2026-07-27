@@ -19,7 +19,7 @@ cv2_qt_fonts = os.path.join(
 os.makedirs(cv2_qt_fonts, exist_ok=True)
 
 # Namecheap PHP API Endpoint
-API_URL = "https://enrichment.longridgetowers.com/dt/face_vectors.php"
+API_URL = ""
 
 # Serial Port Configuration
 SERIAL_PORT = "/dev/ttyUSB0"  # Change to /dev/ttyACM0 if needed
