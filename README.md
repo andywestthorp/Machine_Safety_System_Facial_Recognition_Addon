@@ -2,6 +2,9 @@
 
 A dual-mode Raspberry Pi & Flask facial recognition system designed for real-time verification and web-based enrollment. It uses 128-dimensional face embedding vectors cached locally for high-speed matching, integrates with a backend MySQL/PHP database, and communicates via USB Serial with external hardware (ESP8266/ESP32).
 
+To help explain things, please take a look at this Youtube video:
+https://www.youtube.com/watch?v=8xTHW9tI40U
+
 ---
 
 ## Key Features
@@ -55,3 +58,29 @@ source venv/bin/activate
 
 # Install dependencies
 pip install -r requirements.txt
+```
+## Hardware
+
+This project utilizes the **Goouuu-ESP32-S3-CAM** as its core controller, integrated with a camera, screen, status lighting, and custom 3D/CNC enclosure:
+
+* **Microcontroller & Camera**: [Goouuu-ESP32-S3-CAM](https://github.com/zhuhai-esp/ESP32-S3-Goouuu-Cam/blob/main/Documents/ESP32-S3CAM%E5%8E%9F%E7%90%86%E5%9B%BE.pdf) — Core module driving image capture and system logic.
+* **Display**: [Waveshare 1.28" Round LCD Module](https://www.waveshare.com/wiki/1.28inch_LCD_Module) — Displays a live preview so users can position themselves for recognition.
+* **Trigger Switch**: [RUNCCI-YUN Waterproof Momentary Push Button](https://www.amazon.co.uk/RUNCCI-YUN-Waterproof-Momentary-momentary-Pre-soldered/dp/B0825RCZJS) — Physical trigger pressed to capture a photo and initiate the recognition process.
+* **Lighting**: [24-LED WS2812B 5050 RGB Ring Light](https://www.amazon.co.uk/dp/B07DKJ6SFR/) — Surrounds the display to evenly illuminate subject faces for accurate detection.
+* **Enclosure**: [OnShape CAD Model](https://cad.onshape.com/documents/e8091fb71c589a1951f0c958/w/28693c77fca783187902ff98/e/2a3cb1dce8734d894cc1e33f) — Custom housing consisting of 3D-printed main body parts and a solid front disc CNC-routed from acrylic.
+
+| Component | Component Pin / Function | ESP32-S3 GPIO | Notes / Protocol |
+| :--- | :--- | :--- | :--- |
+| **GC9A01 LCD Display** | SCLK / CLK | **GPIO 48** | SPI Clock |
+| | MOSI / SDA / DIN | **GPIO 47** | SPI Data |
+| | DC / RS | **GPIO 21** | Data / Command Selection |
+| | CS | **GPIO 45** | Chip Select |
+| | RES / RST | **GPIO 19** | Hardware Reset |
+| **WS2812 Ring Light** | Data In (DI) | **GPIO 1** | 24-LED Neopixel Data Pin |
+| **Trigger Switch** | Button Signal | **GPIO 2** | Active Low / Internal Pull-Up (`INPUT_PULLUP`) |
+| **Serial Communications** | TX | **TX** | To **RX** on existing device |
+| Note: Disconnect when uploading| RX | **RX** | To **TX** on existing device |
+
+
+
+
