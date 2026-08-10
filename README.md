@@ -2,8 +2,11 @@
 
 A dual-mode Raspberry Pi & Flask facial recognition system designed for real-time verification and web-based enrollment. It uses 128-dimensional face embedding vectors cached locally for high-speed matching, integrates with a backend MySQL/PHP database, and communicates via USB Serial with external hardware (ESP8266/ESP32).
 
-To help explain things, please take a look at this Youtube video:
-https://www.youtube.com/watch?v=8xTHW9tI40U
+To help explain things, please take a look at the following Youtube videos:
+
+* **New feature**: (https://www.youtube.com/watch?v=8xTHW9tI40U) — Proof of concept
+* **Existing system in workshop**: (https://www.youtube.com/watch?v=OMUBlsAB1YI) — The current RFID system.
+* **Trigger Switch**: (https://www.youtube.com/watch?v=gfuSRVSx0mU) — The simple management console.
 
 ---
 
