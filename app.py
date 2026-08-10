@@ -12,7 +12,7 @@ app = Flask(__name__)
 # -----------------------------------------------------------------------------
 # CONFIGURATION & CONSTANTS
 # -----------------------------------------------------------------------------
-API_URL = "https://enrichment.longridgetowers.com/dt/face_vectors.php"
+API_URL = "<the address of your server php file>"
 DISTANCE_THRESHOLD = 0.55  # Match tolerance (lower = stricter)
 
 SAVE_DEBUG_SNAPS = False   # Set to True to save snapshots in snaps/
