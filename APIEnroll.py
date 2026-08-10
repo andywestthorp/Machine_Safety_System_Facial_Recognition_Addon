@@ -8,7 +8,7 @@ import requests
 os.environ["QT_QPA_PLATFORM"] = "xcb"
 os.environ["QT_LOGGING_RULES"] = "*=false"
 
-API_URL = "https://enrichment.longridgetowers.com/dt/face_vectors.php"
+API_URL = "<the address of your php file>"
 
 
 def search_people(surname_prefix):
