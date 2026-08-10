@@ -71,6 +71,7 @@ This project utilizes the **Goouuu-ESP32-S3-CAM** as its core controller, integr
 * **Trigger Switch**: [RUNCCI-YUN Waterproof Momentary Push Button](https://www.amazon.co.uk/RUNCCI-YUN-Waterproof-Momentary-momentary-Pre-soldered/dp/B0825RCZJS) — Physical trigger pressed to capture a photo and initiate the recognition process.
 * **Lighting**: [24-LED WS2812B 5050 RGB Ring Light](https://www.amazon.co.uk/dp/B07DKJ6SFR/) — Surrounds the display to evenly illuminate subject faces for accurate detection.
 * **Enclosure**: [OnShape CAD Model](https://cad.onshape.com/documents/e8091fb71c589a1951f0c958/w/28693c77fca783187902ff98/e/2a3cb1dce8734d894cc1e33f) — Custom housing consisting of 3D-printed main body parts and a solid front disc CNC-routed from acrylic.
+* **Verboard**: [Veroboard layout](https://docs.google.com/spreadsheets/d/1DIZG8RGt1cOTnuqbnMkGolhMt0qVLZ1eX0zNYUsCOxE/edit?usp=sharing) — Strip board can be used for this simple layout.
 
 | Component | Component Pin / Function | ESP32-S3 GPIO | Notes / Protocol |
 | :--- | :--- | :--- | :--- |
@@ -83,6 +84,10 @@ This project utilizes the **Goouuu-ESP32-S3-CAM** as its core controller, integr
 | **Trigger Switch** | Button Signal | **GPIO 2** | Active Low / Internal Pull-Up |
 | **Serial Communications** | TX | **TX** | To **RX** on existing device |
 | Note: Disconnect when uploading| RX | **RX** | To **TX** on existing device |
+
+
+
+
 
 
 
