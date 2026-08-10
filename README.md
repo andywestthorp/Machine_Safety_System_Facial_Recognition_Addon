@@ -80,7 +80,7 @@ This project utilizes the **Goouuu-ESP32-S3-CAM** as its core controller, integr
 | | CS | **GPIO 45** | Chip Select |
 | | RES / RST | **GPIO 19** | Hardware Reset |
 | **WS2812 Ring Light** | Data In (DI) | **GPIO 1** | 24-LED Neopixel Data Pin |
-| **Trigger Switch** | Button Signal | **GPIO 2** | Active Low / Internal Pull-Up (`INPUT_PULLUP`) |
+| **Trigger Switch** | Button Signal | **GPIO 2** | Active Low / Internal Pull-Up |
 | **Serial Communications** | TX | **TX** | To **RX** on existing device |
 | Note: Disconnect when uploading| RX | **RX** | To **TX** on existing device |
 
