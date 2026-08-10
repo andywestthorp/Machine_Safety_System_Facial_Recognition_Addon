@@ -70,7 +70,7 @@ This project utilizes the **Goouuu-ESP32-S3-CAM** as its core controller, integr
 * **Display**: [Waveshare 1.28" Round LCD Module](https://www.waveshare.com/wiki/1.28inch_LCD_Module) — Displays a live preview so users can position themselves for recognition.
 * **Trigger Switch**: [RUNCCI-YUN Waterproof Momentary Push Button](https://www.amazon.co.uk/RUNCCI-YUN-Waterproof-Momentary-momentary-Pre-soldered/dp/B0825RCZJS) — Physical trigger pressed to capture a photo and initiate the recognition process.
 * **Lighting**: [24-LED WS2812B 5050 RGB Ring Light](https://www.amazon.co.uk/dp/B07DKJ6SFR/) — Surrounds the display to evenly illuminate subject faces for accurate detection.
-* **Enclosure**: [OnShape CAD Model](https://cad.onshape.com/documents/e8091fb71c589a1951f0c958/w/28693c77fca783187902ff98/e/2a3cb1dce8734d894cc1e33f) — Custom housing consisting of 3D-printed main body parts and a solid front disc CNC-routed from acrylic.
+* **Enclosure**: [OnShape CAD Model](https://cad.onshape.com/documents/e8091fb71c589a1951f0c958/w/28693c77fca783187902ff98/e/2a3cb1dce8734d894cc1e33f?renderMode=0&uiState=6a79f3552ffbc9994ff3b5aa) — Custom housing consisting of 3D-printed main body parts and a solid front disc CNC-routed from acrylic.
 
 | Component | Component Pin / Function | ESP32-S3 GPIO | Notes / Protocol |
 | :--- | :--- | :--- | :--- |
