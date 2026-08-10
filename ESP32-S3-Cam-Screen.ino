@@ -1,18 +1,22 @@
+// ====================================================================================
+// This code is for an ESP32-S3-CAM - Not just an ESP32CAM - as we need more GPIO lines
+// ====================================================================================
+
 #include "esp_camera.h"
 #include <WiFi.h>
 #include <HTTPClient.h>
 #define LGFX_USE_V1
 #include <LovyanGFX.hpp>
 #include <ArduinoJson.h>
-#include <Adafruit_NeoPixel.h> // <-- Add NeoPixel library!
+#include <Adafruit_NeoPixel.h>
 
 // ============================================================================
 // 0. WI-FI & FLASK SERVER CONFIGURATION
 // ============================================================================
 
-const char* WIFI_SSID     = "bobby";      
-const char* WIFI_PASS     = "sparklebear";  
-const char* SERVER_URL    = "http://192.168.1.230:5000/upload"; 
+const char* WIFI_SSID     = "<your_wifi>";      
+const char* WIFI_PASS     = "<your_password>";  
+const char* SERVER_URL    = "http://<server_address>:5000/upload"; 
 
 #define BUTTON_PIN 2
 
