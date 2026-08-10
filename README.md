@@ -1,154 +1,57 @@
-# Machine Safety System - Facial Recognition Addon
+# DTFace — Facial Recognition & Enrollment System
 
-A lightweight hybrid web and desktop application designed to enroll, store, and verify pupil facial recognition vectors. The system uses a **PHP/JS** interface for vector enrollment via a web browser and a **Python** script for real-time video verification.
-
-This is an addon to an existing RFID based system which I built a few years ago and have trialled with my pupils- but found that they often forgot to bring their RFID tags. Hopefully, they won't forget to bring their faces?
+A dual-mode Raspberry Pi & Flask facial recognition system designed for real-time verification and web-based enrollment. It uses 128-dimensional face embedding vectors cached locally for high-speed matching, integrates with a backend MySQL/PHP database, and communicates via USB Serial with external hardware (ESP8266/ESP32).
 
 ---
 
-## 🌟 Features
+## Key Features
 
-* **Web-Based Enrollment (`enroll.php`):**
-  * Searchable pupil selection dropdown powered by **Select2**.
-  * Real-time browser webcam capture using **face-api.js**.
-  * Extracts 128-dimensional face embeddings and saves them directly to MySQL.
-  * Auto-updates the pupil database flags (`has_vector = 1`).
-
-* **Real-Time Verification (`verify.py`):**
-  * Connects to MySQL and loads enrolled face vector profiles into memory.
-  * Live camera stream processing using **OpenCV** and **dlib (`face_recognition`)**.
-  * Frame scaling and downsampling for high-FPS detection.
-  * Real-time bounding box rendering (Green = Recognized, Red = Unknown).
+* **High-Speed Hardware Processing**: Captures frames natively via `picamera2` and renders them directly to a 3.5" SPI TFT framebuffer (`/dev/fb0` / `/dev/fb1`) without requiring a desktop GUI.
+* **Dual-Mode Flask Application**: Supports both live verification matching and interactive face enrollment using an embedded web dashboard.
+* **Offline RAM Caching**: Downloads 128-D vectors from a central API on startup and caches them locally in RAM for ultra-fast local matching.
+* **Serial Hardware Integration**: Sends recognized RFID payload data over USB Serial (`/dev/ttyUSB0`) to an ESP8266/ESP32 to trigger the machinery relays.
+* **Read-Only System Safeguard**: Configured to run on a Raspberry Pi Read-Only (RO) overlay filesystem to protect the SD card from power-cut corruption.
 
 ---
 
-## 🗄️ Database Prerequisites
+## Tech Stack & Dependencies
 
-Ensure your MySQL database (`longtwla_Standard_Information`) contains a `Pupils` table with the following minimal structure:
+### Python Environment
+* **Python**: 3.x (Virtual Environment)
+* **Core Libraries**:
+  * `face_recognition` (1.3.0) — Dlib-based 128-D facial vector generation
+  * `opencv-python` (5.0.0.93) — Video frame manipulation and framebuffer rendering
+  * `Flask` (3.1.3) — Enrollment web portal & upload handler
+  * `picamera2` — Native Raspberry Pi camera module capture
+  * `pyserial` (3.5) — Serial communication with ESP8266
+  * `numpy` (2.5.2) — Vector operations
+  * `requests` (2.34.2) — Remote API communication
 
-```sql
-ALTER TABLE Pupils 
-ADD COLUMN face_vector TEXT DEFAULT NULL,
-ADD COLUMN has_vector TINYINT(1) DEFAULT 0;
-
-```
-
----
-
-## 🚀 Quick Start & Installation
-
-### 1. Web Enrollment Setup (`enroll.php`)
-
-1. Host `enroll.php` on a web server running PHP 7.4+ and MySQL.
-2. Update the database credentials at the top of `enroll.php`:
-```php
-$host     = 'localhost';
-$db_name  = 'longtwla_Standard_Information';
-$username = 'YOUR_DB_USER';
-$password = 'YOUR_DB_PASSWORD';
-
-```
-
-
-3. Open `enroll.php` in your web browser, grant camera permissions, select a pupil, and click **Capture Face** then **Save Vector**.
+### Backend Stack
+* **Web Server**: Apache/Nginx with PHP (PDO extension)
+* **Database**: MySQL / MariaDB (Tables for `Pupils`, `Staff`, and `RFID_Pupil`)
 
 ---
 
-### 2. Python Verification Setup (`verify.py`)
+## System Architecture & Workflow
 
-#### Prerequisites
+1. **Startup**: The Python application fetches all active face vectors from the remote endpoint (`https://enrichment.longridgetowers.com/dt/face_vectors.php`) and caches them into RAM[cite: 5, 6].
+2. **Verification Mode**: Camera frames are captured, downscaled to 1/4 size for CPU optimization, and checked against cached vectors.
+3. **Hardware Trigger**: Upon a match (distance $< 0.55$), the user's details are displayed on the local 3.5" screen, and an RFID payload (`Face Recognised, RFID= XXXXX\n`) is transmitted over Serial[cite: 4, 5].
+4. **Enrollment Mode**: Administrators access the web dashboard (`http://<PI_IP>:5000/`) to search for an individual and trigger enrollment mode[cite: 5]. The next face captured is vectorized and saved to the database via a POST request[cite: 5, 6].
 
-* Python 3.8+
-* A working webcam
+---
 
-#### Step 1: Clone the Repository
+## Installation & Setup
 
+### 1. Clone & Set Up Python Environment
 ```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-cd your-repo-name
+git clone [https://github.com/your-username/DTFace.git](https://github.com/your-username/DTFace.git)
+cd DTFace
 
-```
-
-#### Step 2: Create & Activate a Virtual Environment
-
-* **Windows (Command Prompt):**
-```cmd
-python -m venv venv
-venv\Scripts\activate
-
-```
-
-
-* **Windows (PowerShell):**
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-```
-
-
-* **macOS / Linux:**
-```bash
+# Create and activate virtual environment
 python3 -m venv venv
 source venv/bin/activate
 
-```
-
-
-
-#### Step 3: Install Dependencies
-
-```bash
-pip install opencv-python face_recognition mysql-connector-python numpy
-
-```
-
-> **Note for Windows Users:** Installing `face_recognition` requires `dlib`. If you hit building errors, install CMake first:
-> `pip install cmake`
-
-#### Step 4: Configure Database Settings
-
-Edit the `DB_CONFIG` dictionary inside `verify.py`:
-
-```python
-DB_CONFIG = {
-    "host": "localhost",
-    "user": "YOUR_DB_USER",
-    "password": "YOUR_DB_PASSWORD",
-    "database": "longtwla_Standard_Information"
-}
-
-```
-
-#### Step 5: Run Verification
-
-```bash
-python verify.py
-
-```
-
-* Press **`q`** at any time to exit the camera feed.
-
----
-
-## 🛠️ Configuration & Tuning
-
-In `verify.py`, you can fine-tune recognition sensitivity by altering the tolerance threshold on line 91:
-
-```python
-matches = face_recognition.compare_faces(known_encodings, face_encoding, tolerance=0.55)
-
-```
-
-* **Lower tolerance (e.g., `0.45`):** Stricter matching. Reduces false positives but may require better lighting.
-* **Higher tolerance (e.g., `0.65`):** More forgiving matching. Useful for low-light environments.
-
----
-
-## 📜 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
-```
-
-```
+# Install dependencies
+pip install -r requirements.txt
